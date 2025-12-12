@@ -1,45 +1,45 @@
 package nl.suriani.machine8.cpu;
 
 public class CPU8 {
-    private MemoryBus memoryBus;
-    private final Register16 pc;
-    private final Register16 sp1;
-    private final Register16 sp2;
-    private final Register16 sp3;
-    private final Register16 sp4;
-    private final Register8 acc;
-    private final Register8 r1;
-    private final Register8 r2;
-    private final Register8 r3;
-    private final Register8 r4;
-    private final Register8 r5;
-    private final Register8 r6;
-    private final Register8 r7;
-    private final Register8 r8;
-    private final Register2 s;
-    private final Register2 pbr;
+    MemoryBus memoryBus;
+    final Register16 pc;
+    final Register16 sp1;
+    final Register16 sp2;
+    final Register16 sp3;
+    final Register16 sp4;
+    final Register8 acc;
+    final Register8 r1;
+    final Register8 r2;
+    final Register8 r3;
+    final Register8 r4;
+    final Register8 r5;
+    final Register8 r6;
+    final Register8 r7;
+    final Register8 r8;
+    final Register2 s;
+    final Register2 pbr;
 
-    private static final int CPU_STATE_HALTED = 0;
-    private static final int CPU_STATE_READY = 1;
-    private static final int CPU_STATE_RUNNING = 2;
-    private static final int CPU_STATE_ERROR = 3;
+    static final int CPU_STATE_HALTED = 0;
+    static final int CPU_STATE_READY = 1;
+    static final int CPU_STATE_RUNNING = 2;
+    static final int CPU_STATE_ERROR = 3;
 
-    private static final int OPCODE_SYS = 0x0;
-    private static final int OPCODE_LDI = 0x1;
-    private static final int OPCODE_LDA = 0x2;
-    private static final int OPCODE_STR = 0x3;
-    private static final int OPCODE_PSH = 0x4;
-    private static final int OPCODE_POP = 0x5;
-    private static final int OPCODE_ADD = 0x6;
-    private static final int OPCODE_SUB = 0x7;
-    private static final int OPCODE_INC = 0x8;
-    private static final int OPCODE_DEC = 0x9;
-    private static final int OPCODE_MUL = 0xa;
-    private static final int OPCODE_DIV = 0xb;
-    private static final int OPCODE_JMP = 0xc;
-    private static final int OPCODE_JMZ = 0xd;
-    private static final int OPCODE_JNZ = 0xe;
-    private static final int OPCODE_RET = 0xf;
+    static final int OPCODE_SYS = 0x0;
+    static final int OPCODE_LDI = 0x1;
+    static final int OPCODE_LDA = 0x2;
+    static final int OPCODE_STR = 0x3;
+    static final int OPCODE_PSH = 0x4;
+    static final int OPCODE_POP = 0x5;
+    static final int OPCODE_ADD = 0x6;
+    static final int OPCODE_SUB = 0x7;
+    static final int OPCODE_INC = 0x8;
+    static final int OPCODE_DEC = 0x9;
+    static final int OPCODE_MUL = 0xa;
+    static final int OPCODE_DIV = 0xb;
+    static final int OPCODE_JMP = 0xc;
+    static final int OPCODE_JMZ = 0xd;
+    static final int OPCODE_JNZ = 0xe;
+    static final int OPCODE_RET = 0xf;
 
     public CPU8() {
         this.memoryBus = new DetatchedMemoryBus();
@@ -88,5 +88,28 @@ public class CPU8 {
     public void detachMemoryBus() {
         this.memoryBus = new DetatchedMemoryBus();
         this.s.set(CPU_STATE_HALTED);
+    }
+
+    public void fetchInstruction() {
+        var addressInstruction = pc.get();
+        var instruction = memoryBus.fetchInstruction(addressInstruction);
+        var opcode = instruction >> 12;
+        var operand = instruction & 0x0FFF;
+        s.set(CPU_STATE_RUNNING);
+        switch (opcode) {
+            case OPCODE_SYS -> {
+                if (operand == 0) {
+                    this.s.set(CPU_STATE_HALTED);
+                }
+            }
+
+            case OPCODE_LDI -> acc.set(operand);
+
+            default -> {
+                throw new UnsupportedOperationException("Unknown opcode " + opcode);
+            }
+        }
+
+        pc.set(pc.get() + 1);
     }
 }

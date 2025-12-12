@@ -5,9 +5,14 @@ public class ROM16 {
 
     public ROM16(int[] instructions) {
         this.cells = new Cell16[0x1000];
+
         for (int i = 0; i < this.cells.length; i++) {
             this.cells[i] = new Cell16();
-            this.cells[i].value(instructions[i]);
+            if (i < instructions.length) {
+                this.cells[i].value(instructions[i]);
+            } else  {
+                this.cells[i].value(0);
+            }
         }
     }
 

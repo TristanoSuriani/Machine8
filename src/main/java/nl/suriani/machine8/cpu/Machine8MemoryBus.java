@@ -11,16 +11,17 @@ public class Machine8MemoryBus implements MemoryBus {
 
     @Override
     public int fetchInstruction(int address) {
-        return 0;
+        return rom16.get(address);
     }
 
     @Override
     public int fetchData(int address) {
-        return 0;
+        return ram8.get(address);
     }
 
     @Override
-    public int storeData(int address) {
-        return 0;
+    public int storeData(int address, int value) {
+        ram8.set(address, value);
+        return value;
     }
 }
