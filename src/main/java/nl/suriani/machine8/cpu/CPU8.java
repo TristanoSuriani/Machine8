@@ -71,17 +71,22 @@ public class CPU8 {
             case OPCODE_LDI -> acc.set(operand);
             case OPCODE_LDA -> acc.set(memoryBus.fetchData(operand));
             case OPCODE_STR -> memoryBus.storeData(operand, acc.get());
-            case OPCODE_ADD -> acc.set(acc.get() + operand);
-            case OPCODE_SUB -> acc.set(acc.get() - operand);
+            case OPCODE_ADD -> acc.set(acc.get() + memoryBus.fetchData(operand));
+            case OPCODE_SUB -> acc.set(acc.get() - memoryBus.fetchData(operand));
             case OPCODE_INC -> acc.set(acc.get() + 1);
             case OPCODE_DEC -> acc.set(acc.get() - 1);
-            case OPCODE_MUL -> acc.set(acc.get() * operand);
+            case OPCODE_MUL -> acc.set(acc.get() * memoryBus.fetchData(operand));
             case OPCODE_DIV -> {
-                if (operand == 0) {
+                var denominator = memoryBus.fetchData(operand);
+                if (denominator == 0) {
                     s.set(CPU_STATE_ERROR);
                     return;
                 }
-                acc.set(acc.get() / operand);
+                acc.set(acc.get() / denominator);
+            }
+            case OPCODE_JMP -> {
+                pc.set(acc.get());
+                return;
             }
             default -> {
                 throw new UnsupportedOperationException("Unknown opcode " + opcode);
