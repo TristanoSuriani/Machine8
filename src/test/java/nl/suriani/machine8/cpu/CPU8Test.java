@@ -175,13 +175,66 @@ class CPU8Test {
     @Test
     void fetchInstructionJmp() {
         var cpu = new CPU8();
-        var instruction = encodeInstruction(CPU8.OPCODE_JMP, 3); // the operand is ignored here
+        var instruction = encodeInstruction(CPU8.OPCODE_JMP, 3);
         var bus = new Machine8MemoryBus(new int[]{instruction});
+        bus.storeData(3, 7);
         cpu.attachMemoryBus(bus);
         cpu.acc.set(6);
         assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
         cpu.fetchInstruction();
-        assertEquals(6, cpu.pc.get());
+        assertEquals(7, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionJnz_accIsNotZero() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_JNZ, 3);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        bus.storeData(3, 7);
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(7, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionJnz_accIsZero() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_JNZ, 3);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        bus.storeData(3, 7);
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(0);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(1, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionJmz_accIsNotZero() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_JMZ, 3);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        bus.storeData(3, 7);
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(1, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionJmz_accIsZero() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_JMZ, 3);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        bus.storeData(3, 7);
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(0);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(7, cpu.pc.get());
     }
 
     private int encodeInstruction(int opcode, int operand) {

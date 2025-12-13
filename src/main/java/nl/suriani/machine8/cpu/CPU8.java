@@ -85,8 +85,20 @@ public class CPU8 {
                 acc.set(acc.get() / denominator);
             }
             case OPCODE_JMP -> {
-                pc.set(acc.get());
+                pc.set(memoryBus.fetchData(operand));
                 return;
+            }
+            case OPCODE_JNZ -> {
+                if (acc.get() != 0) {
+                    pc.set(memoryBus.fetchData(operand));
+                    return;
+                }
+            }
+            case OPCODE_JMZ -> {
+                if (acc.get() == 0) {
+                    pc.set(memoryBus.fetchData(operand));
+                    return;
+                }
             }
             default -> {
                 throw new UnsupportedOperationException("Unknown opcode " + opcode);
