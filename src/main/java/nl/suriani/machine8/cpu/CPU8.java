@@ -91,10 +91,14 @@ public class CPU8 {
     }
 
     public void fetchInstruction() {
+        if (s.get() == CPU_STATE_ERROR || s.get() == CPU_STATE_HALTED) {
+            return;
+        }
+
         var addressInstruction = pc.get();
         var instruction = memoryBus.fetchInstruction(addressInstruction);
-        var opcode = instruction >> 12;
-        var operand = instruction & 0x0FFF;
+        int opcode  = (instruction >>> 12) & 0xF;
+        int operand = instruction & 0x0FFF;
         s.set(CPU_STATE_RUNNING);
         switch (opcode) {
             case OPCODE_SYS -> {
@@ -110,7 +114,14 @@ public class CPU8 {
             case OPCODE_SUB -> acc.set(acc.get() - operand);
             case OPCODE_INC -> acc.set(acc.get() + 1);
             case OPCODE_DEC -> acc.set(acc.get() - 1);
-
+            case OPCODE_MUL -> acc.set(acc.get() * operand);
+            case OPCODE_DIV -> {
+                if (operand == 0) {
+                    s.set(CPU_STATE_ERROR);
+                    return;
+                }
+                acc.set(acc.get() / operand);
+            }
             default -> {
                 throw new UnsupportedOperationException("Unknown opcode " + opcode);
             }

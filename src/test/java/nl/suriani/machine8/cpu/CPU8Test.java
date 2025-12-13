@@ -130,6 +130,44 @@ class CPU8Test {
         assertEquals(1, cpu.pc.get());
     }
 
+    @Test
+    void fetchInstructionMul() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_MUL, 3);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(18, cpu.acc.get());
+        assertEquals(1, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionDiv() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_DIV, 3);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(2, cpu.acc.get());
+        assertEquals(1, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionDiv_by0_error() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_DIV, 0);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(CPU8.CPU_STATE_ERROR, cpu.s.get());
+    }
+
     private int encodeInstruction(int opcode, int operand) {
         return ((opcode & 0xF) << 12) | (operand & 0x0FFF);
     }
