@@ -78,6 +78,32 @@ class CPU8Test {
         assertEquals(1, cpu.pc.get());
     }
 
+    @Test
+    void fetchInstructionAdd() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_ADD, 10);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(16, cpu.acc.get());
+        assertEquals(1, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionSub() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_SUB, 6);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(5);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(255, cpu.acc.get()); // underflow by wrapping around
+        assertEquals(1, cpu.pc.get());
+    }
+
     private int encodeInstruction(int opcode, int operand) {
         return ((opcode & 0xF) << 12) | (operand & 0x0FFF);
     }
