@@ -104,6 +104,32 @@ class CPU8Test {
         assertEquals(1, cpu.pc.get());
     }
 
+    @Test
+    void fetchInstructionInc() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_INC, 6); // the operand gets actually ignored here
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(7, cpu.acc.get());
+        assertEquals(1, cpu.pc.get());
+    }
+
+    @Test
+    void fetchInstructionDec() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_DEC, 3); // the operand gets actually ignored here
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.acc.set(6);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(5, cpu.acc.get());
+        assertEquals(1, cpu.pc.get());
+    }
+
     private int encodeInstruction(int opcode, int operand) {
         return ((opcode & 0xF) << 12) | (operand & 0x0FFF);
     }

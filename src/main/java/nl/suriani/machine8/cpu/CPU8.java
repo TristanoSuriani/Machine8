@@ -108,6 +108,8 @@ public class CPU8 {
             case OPCODE_STR -> memoryBus.storeData(operand, acc.get());
             case OPCODE_ADD -> acc.set(acc.get() + operand);
             case OPCODE_SUB -> acc.set(acc.get() - operand);
+            case OPCODE_INC -> acc.set(acc.get() + 1);
+            case OPCODE_DEC -> acc.set(acc.get() - 1);
 
             default -> {
                 throw new UnsupportedOperationException("Unknown opcode " + opcode);
