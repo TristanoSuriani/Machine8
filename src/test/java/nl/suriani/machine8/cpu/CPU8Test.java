@@ -51,6 +51,19 @@ class CPU8Test {
         assertEquals(10, cpu.acc.get());
     }
 
+    @Test
+    void fetchInstructionLda() {
+        var cpu = new CPU8();
+        var instruction = encodeInstruction(CPU8.OPCODE_LDA, 10);
+        var bus = new Machine8MemoryBus(new int[]{instruction});
+        cpu.attachMemoryBus(bus);
+        cpu.memoryBus.storeData(10, 5);
+        assertEquals(CPU8.CPU_STATE_READY, cpu.s.get());
+        cpu.fetchInstruction();
+        assertEquals(CPU8.CPU_STATE_RUNNING, cpu.s.get());
+        assertEquals(5, cpu.acc.get());
+    }
+
     private int encodeInstruction(int opcode, int operand) {
         return ((opcode & 0xF) << 12) | (operand & 0x0FFF);
     }

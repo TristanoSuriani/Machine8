@@ -104,6 +104,7 @@ public class CPU8 {
             }
 
             case OPCODE_LDI -> acc.set(operand);
+            case OPCODE_LDA -> acc.set(memoryBus.fetchData(operand));
 
             default -> {
                 throw new UnsupportedOperationException("Unknown opcode " + opcode);
