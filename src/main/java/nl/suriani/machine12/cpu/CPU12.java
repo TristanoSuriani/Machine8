@@ -6,27 +6,27 @@ public class CPU12 {
     final Register12 acc;
     final Register2 s;
 
-    static final int CPU_STATE_HALTED = 0;
-    static final int CPU_STATE_READY = 1;
-    static final int CPU_STATE_RUNNING = 2;
-    static final int CPU_STATE_ERROR = 3;
+    public static final int CPU_STATE_HALTED = 0;
+    public static final int CPU_STATE_READY = 1;
+    public static final int CPU_STATE_RUNNING = 2;
+    public static final int CPU_STATE_ERROR = 3;
 
-    static final int OPCODE_SYS = 0x0;
-    static final int OPCODE_LDI = 0x1;
-    static final int OPCODE_LDA = 0x2;
-    static final int OPCODE_STR = 0x3;
-    static final int OPCODE_PSH = 0x4;
-    static final int OPCODE_POP = 0x5;
-    static final int OPCODE_ADD = 0x6;
-    static final int OPCODE_SUB = 0x7;
-    static final int OPCODE_INC = 0x8;
-    static final int OPCODE_DEC = 0x9;
-    static final int OPCODE_MUL = 0xa;
-    static final int OPCODE_DIV = 0xb;
-    static final int OPCODE_JMP = 0xc;
-    static final int OPCODE_JMZ = 0xd;
-    static final int OPCODE_JNZ = 0xe;
-    static final int OPCODE_XOR = 0xf;
+    public static final int OPCODE_SYS = 0x0;
+    public static final int OPCODE_LDI = 0x1;
+    public static final int OPCODE_LDA = 0x2;
+    public static final int OPCODE_STR = 0x3;
+    public static final int OPCODE_PSH = 0x4;
+    public static final int OPCODE_POP = 0x5;
+    public static final int OPCODE_ADD = 0x6;
+    public static final int OPCODE_SUB = 0x7;
+    public static final int OPCODE_INC = 0x8;
+    public static final int OPCODE_DEC = 0x9;
+    public static final int OPCODE_MUL = 0xa;
+    public static final int OPCODE_DIV = 0xb;
+    public static final int OPCODE_JMP = 0xc;
+    public static final int OPCODE_JMZ = 0xd;
+    public static final int OPCODE_JNZ = 0xe;
+    public static final int OPCODE_XOR = 0xf;
 
     public CPU12() {
         this.memoryBus = new DetatchedMemoryBus();
@@ -109,5 +109,9 @@ public class CPU12 {
         }
 
         pc.set(pc.get() + 1);
+    }
+
+    public int s() {
+        return s.get();
     }
 }
