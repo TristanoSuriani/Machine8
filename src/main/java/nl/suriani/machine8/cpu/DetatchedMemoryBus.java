@@ -15,4 +15,14 @@ public class DetatchedMemoryBus implements MemoryBus {
     public int storeData(int address, int value) {
         return 0;
     }
+
+    @Override
+    public int push(int stackSegment, int value) {
+        return 0;
+    }
+
+    @Override
+    public int pop(int stackSegment) {
+        return 0;
+    }
 }

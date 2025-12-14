@@ -26,7 +26,7 @@ public class CPU8 {
     static final int OPCODE_JMP = 0xc;
     static final int OPCODE_JMZ = 0xd;
     static final int OPCODE_JNZ = 0xe;
-    static final int OPCODE_RET = 0xf;
+    static final int OPCODE_XOR = 0xf;
 
     public CPU8() {
         this.memoryBus = new DetatchedMemoryBus();
@@ -71,6 +71,8 @@ public class CPU8 {
             case OPCODE_LDI -> acc.set(operand);
             case OPCODE_LDA -> acc.set(memoryBus.fetchData(operand));
             case OPCODE_STR -> memoryBus.storeData(operand, acc.get());
+            case OPCODE_PSH -> memoryBus.push(operand, acc.get());
+            case OPCODE_POP -> acc.set(memoryBus.pop(operand));
             case OPCODE_ADD -> acc.set(acc.get() + memoryBus.fetchData(operand));
             case OPCODE_SUB -> acc.set(acc.get() - memoryBus.fetchData(operand));
             case OPCODE_INC -> acc.set(acc.get() + 1);
@@ -100,6 +102,7 @@ public class CPU8 {
                     return;
                 }
             }
+            case OPCODE_XOR -> acc.set(acc.get() ^ memoryBus.fetchData(operand));
             default -> {
                 throw new UnsupportedOperationException("Unknown opcode " + opcode);
             }
