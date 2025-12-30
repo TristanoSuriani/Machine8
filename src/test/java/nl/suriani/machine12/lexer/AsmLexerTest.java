@@ -41,6 +41,30 @@ class AsmLexerTest {
         assertInstanceOf(AsmToken.EOL.class, tokens.getFirst());
     }
 
+    @Test
+    void directive() {
+        var program = ".data\n";
+        var result = asmLexer.lex(programToStream(program));
+        assertInstanceOf(LexerResult.Ok.class, result);
+        var ok = (LexerResult.Ok) result;
+        var tokens = ok.tokens().toList();
+        assertEquals(2, tokens.size());
+        assertInstanceOf(AsmToken.Directive.class, tokens.getFirst());
+        assertEquals(".data", ((AsmToken.Directive) tokens.getFirst()).value());
+    }
+
+    @Test
+    void stringLiteral() {
+        var program = "\"sprites.asm\"";
+        var result = asmLexer.lex(programToStream(program));
+        assertInstanceOf(LexerResult.Ok.class, result);
+        var ok = (LexerResult.Ok) result;
+        var tokens = ok.tokens().toList();
+        assertEquals(2, tokens.size());
+        assertInstanceOf(AsmToken.StringLiteral.class, tokens.getFirst());
+        assertEquals("\"sprites.asm\"", ((AsmToken.StringLiteral) tokens.getFirst()).value());
+    }
+
     private Stream<LocatedChar> programToStream(String program) {
         var locatedChars = new ArrayList<LocatedChar>();
         var row = 1;

@@ -21,33 +21,77 @@ public class AsmLexer implements Lexer<AsmToken> {
 
         while (!remainingCharacters.isEmpty()) {
             var first = remainingCharacters.pop();
-            if (first.character() == ';') {
-                var token = insideInlineComment(remainingCharacters, first.lineNumber());
-                tokens.add(token);
+            switch (first.character()) {
+                case ';' -> insideInlineComment(remainingCharacters, tokens);
+                case '.' -> insideDirective(remainingCharacters, tokens);
+                case '"' -> insideStringLiteral(remainingCharacters, tokens);
             }
+        }
+        if (tokens.isEmpty() || !(tokens.getLast() instanceof AsmToken.EOL)) {
+            tokens.add(new AsmToken.EOL(tokens.isEmpty() ? 1 : tokens.getLast().row() + 1, 1));
         }
         return tokens;
     }
 
-    private AsmToken insideStringLiteral(Deque<LocatedChar> remainingCharacters) {
-        return null;
+    private void insideStringLiteral(Deque<LocatedChar> remainingCharacters, List<AsmToken> tokens) {
+        if (remainingCharacters.isEmpty()) {
+            throw new IllegalStateException("Empty string literal");
+        }
+        var row = remainingCharacters.peek().lineNumber();
+        var column = remainingCharacters.peek().columnNumber() - 1;
+        var tokenBuilder = new StringBuilder("\"");
+        while (!remainingCharacters.isEmpty()) {
+            var first = remainingCharacters.pop();
+            if (first.character() == '"') {
+                tokenBuilder.append('"');
+                tokens.add(new AsmToken.StringLiteral(tokenBuilder.toString(), row, column));
+                return;
+            }
+            tokenBuilder.append(first.character());
+        }
     }
 
-    private AsmToken insideInlineComment(Deque<LocatedChar> remainingCharacters, int row) {
+    private void insideInlineComment(Deque<LocatedChar> remainingCharacters, List<AsmToken> tokens) {
         while (!remainingCharacters.isEmpty()) {
             var first = remainingCharacters.pop();
             if (first.character() == '\n') {
-                return new AsmToken.EOL(first.lineNumber(), first.columnNumber());
+                remainingCharacters.push(first);
+                return;
             }
         }
-        return new AsmToken.EOL(row + 1, 1);
     }
 
-    private AsmToken insideDirective(Deque<LocatedChar> remainingCharacters) {
-        return null;
+    private void insideDirective(Deque<LocatedChar> remainingCharacters, List<AsmToken> tokens) {
+        if (remainingCharacters.isEmpty()) {
+            throw new IllegalStateException("Empty directive");
+        }
+        var row = remainingCharacters.peek().lineNumber();
+        var column = remainingCharacters.peek().columnNumber() - 1;
+        var tokenBuilder = new StringBuilder(".");
+
+        while (!remainingCharacters.isEmpty()) {
+            var first = remainingCharacters.pop();
+            if (isDelimiter(first.character())) {
+                remainingCharacters.push(first);
+                tokens.add(new AsmToken.Directive(tokenBuilder.toString(), row, column));
+                return;
+            }
+            tokenBuilder.append(first.character());
+        }
     }
 
     private AsmToken insideIdentifier(Deque<LocatedChar> remainingCharacters) {
         return null;
+    }
+
+    private boolean isDelimiter(char c) {
+        return c == ' '
+                || c == '\r'
+                || c == '\n'
+                || c == '\t'
+                || c == '{'
+                || c == '}'
+                || c == '.'
+                || c == ';';
     }
 }
